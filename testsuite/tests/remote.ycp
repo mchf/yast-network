@@ -25,6 +25,8 @@ map EXEC = $[
     ],
 ];
 
+Testsuite::Init( [READ, $[], EXEC], nil);
+
 import "Remote";
 
 // currently used default server_args from Xvnc package
