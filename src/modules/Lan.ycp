@@ -95,7 +95,9 @@ global boolean virt_net_proposal = nil;
 global boolean automatic_configuration=false;
 
 
-// ipv6 module
+/**
+ * IPv6 state flag
+ */
 global boolean ipv6=true;
 
 /**
@@ -371,17 +373,20 @@ global void SetIPv6(boolean status){
     }
 }
 
-void writeIPv6()
+/**
+ * Enables / disables IPv6 on target system.
+ */
+global void WriteIPv6( boolean ipv6_enabled)
 {
     string filename = "/etc/sysctl.conf";
     string sysctl = (string)SCR::Read(.target.string, filename);
-    string sysctl_row = sformat("%1net.ipv6.conf.all.disable_ipv6 = 1", ipv6 ? "# ":"");
+    string sysctl_row = sformat("%1net.ipv6_enabled.conf.all.disable_ipv6_enabled = 1", ipv6_enabled ? "# ":"");
     boolean found = false;
     list<string> file=[];
 
     foreach(string row, splitstring(sysctl, "\n"), 
     {
-        if (size(regexptokenize(row, "(net.ipv6.conf.all.disable_ipv6)"))>0)
+        if (size(regexptokenize(row, "(net.ipv6_enabled.conf.all.disable_ipv6_enabled)"))>0)
         {
             row = sysctl_row;
             found = true;
@@ -396,8 +401,8 @@ void writeIPv6()
     }
 
     SCR::Write(.target.string, filename, mergestring(file, "\n"));
-    SCR::Execute(.target.bash, sformat("sysctl -w net.ipv6.conf.all.disable_ipv6=%1",!ipv6 ? "1":"0"));
-    SCR::Write(.sysconfig.windowmanager.KDE_USE_IPV6, ipv6 ? "yes":"no");
+    SCR::Execute(.target.bash, sformat("sysctl -w net.ipv6_enabled.conf.all.disable_ipv6_enabled=%1",!ipv6_enabled ? "1":"0"));
+    SCR::Write(.sysconfig.windowmanager.KDE_USE_IPV6, ipv6_enabled ? "yes":"no");
 }
 
 
@@ -507,7 +512,7 @@ global define boolean Write() {
     /* Progress step 7 */
     ProgressNextStage(_("Setting up network services..."));
     NetworkService::EnableDisable ();
-    writeIPv6();
+    WriteIPv6( ipv6);
     sleep(sl);
 
     //Show this only if SuSEfirewall is installed
