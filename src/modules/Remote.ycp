@@ -43,6 +43,7 @@ import "Progress";
 import "Linuxrc";
 import "String";
 import "FileUtils";
+import "Lan";
 
 include "network/routines.ycp";
 
@@ -75,6 +76,11 @@ global string default_dm = "xdm";
  * Only force-reset can change it
  */
 boolean already_proposed = false;
+
+/**
+ * Tells if IPv6 support should be disabled by Remote module
+ */
+boolean disable_ipv6 = true;
 
 /**
  * Checks if remote administration is currently allowed
@@ -364,6 +370,8 @@ global boolean Write() {
     {
         return false;
     }
+
+    Lan::WriteIPv6( !disable_ipv6);
     sleep(sl);
 
    if(Mode::normal ()) {
