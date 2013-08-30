@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Aug 30 12:46:04 UTC 2013 - mfilka@suse.com
+
+- bnc#578787
+    - LanItems provides API for querying all available netcard devices
+- 3.0.5
+
+-------------------------------------------------------------------
 Tue Aug 27 08:20:41 UTC 2013 - jreidinger@suse.com
 
 - do not overwrite curl log for addon (BNC#632917)
