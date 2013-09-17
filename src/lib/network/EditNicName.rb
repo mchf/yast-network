@@ -65,13 +65,15 @@ module Yast
         if ret == :ok
           new_name = Convert.to_string(UI.QueryWidget(:dev_name, :Value))
 
-          break if !change_name_active || new_name == @old_name
+          if new_name != @old_name
+            if CheckUdevNicName(new_name)
+              LanItems.SetCurrentName( new_name)
+            else
+              UI.SetFocus(:dev_name)
+              ret = nil
 
-          if !CheckUdevNicName(new_name)
-            UI.SetFocus(:dev_name)
-            ret = nil
-
-            next
+              next
+            end
           end
 
           if UI.QueryWidget(:udev_type, :CurrentButton) == :mac 
@@ -83,7 +85,6 @@ module Yast
           end
 
           # update udev rules and other config
-          LanItems.SetCurrentName( new_name)
           LanItems.ReplaceItemUdev( @old_key, rule_key, rule_value)
         end
       end
@@ -97,36 +98,34 @@ module Yast
     def open
       UI.OpenDialog(
         VBox(
-          RadioButtonGroup(
-            Id(:udev_type),
-            VBox(
-              #make sure there is enough space (#367239)
-              HSpacing(30),
-              Label(_("Rule by:")),
-              Left(
-                RadioButton(
-                  Id(:mac),
-                  "MAC address: #{@mac}"
-                )
-              ),
-              Left(
-                RadioButton(
-                  Id(:busid),
-                  "BusID: #{@bus_id}"
-                )
-              )
-            )
-          ),
           Left(
             HBox(
-              CheckBox(
-                Id(:change_dev_name),
-                Opt(:notify),
-                _("Change DeviceName"),
-                false
-              ),
+              Label( _( "Device name:") ),
               InputField(Id(:dev_name), "", @old_name)
             )
+          ),
+          VSpacing(0.5),
+          Frame(
+            _( "Base udev rule on"),
+            RadioButtonGroup(
+              Id(:udev_type),
+              VBox(
+                #make sure there is enough space (#367239)
+                HSpacing(30),
+                Left(
+                  RadioButton(
+                    Id(:mac),
+                    "MAC address: #{@mac}"
+                  )
+                ),
+                Left(
+                  RadioButton(
+                    Id(:busid),
+                    "BusID: #{@bus_id}"
+                  )
+                )
+              )
+            ),
           ),
           VSpacing(0.5),
           HBox(
@@ -143,8 +142,6 @@ module Yast
       else
         Builtins.y2error("Unknown udev rule ")
       end
-
-      UI.ChangeWidget(:dev_name, :Enabled, false)
     end
   
     protected
