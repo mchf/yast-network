@@ -29,9 +29,9 @@
 module Yast
   module NetworkServicesDnsInclude
 
-    RESOLV_CONF_POLICIES = {
-      static:          "STATIC",
-      static_fallback: "STATIC_FALLBACK"
+    CUSTOM_RESOLV_POLICIES = {
+      "STATIC" =>          "STATIC",
+      "STATIC_FALLBACK" => "STATIC_FALLBACK"
     }
 
     def initialize_network_services_dns(include_target)
@@ -166,7 +166,7 @@ module Yast
           "widget" => :combobox,
           "label"  => _("&Custom Policy Rule"),
           "opt"    => [:editable],
-          "items"  => RESOLV_CONF_POLICIES.to_a,
+          "items"  => CUSTOM_RESOLV_POLICIES.to_a,
           "init"   => fun_ref(method(:initPolicy), "void (string)"),
           "handle" => fun_ref(method(:handlePolicy), "symbol (string, map)"),
           "help"   => ""
@@ -341,7 +341,7 @@ module Yast
       DNS.write_hostname = Ops.get_boolean(settings, "WRITE_HOSTNAME", true)
 
       # "auto" is default defined in netconfig
-      policy_name = RESOLV_CONF_POLICIES[settings["PLAIN_POLICY"]]
+      policy_name = CUSTOM_RESOLV_POLICIES[settings["PLAIN_POLICY"]]
       DNS.resolv_conf_policy = policy_name
 
       # update modified flag
@@ -560,7 +560,6 @@ module Yast
       true
     end
 
-
     def initPolicy(key)
       #first initialize correctly
       Builtins.y2milestone(
@@ -598,17 +597,23 @@ module Yast
       nil
     end
 
+    def modify_resolv_default
+      if DNS.resolv_conf_policy == nil || DNS.resolv_conf_policy == ""
+        default = Id(:nomodify)
+      elsif DNS.resolv_conf_policy == "auto" || DNS.resolv_conf_policy == "STATIC *"
+        default = Id(:auto)
+      else
+        default = Id(:custom)
+      end
+    end
+
     def initModifyResolvPolicy(key)
       Builtins.y2milestone("initModifyResolvPolicy")
+
       #first initialize correctly
-      if DNS.resolv_conf_policy == nil || DNS.resolv_conf_policy == ""
-        UI.ChangeWidget(Id("MODIFY_RESOLV"), :Value, Id(:nomodify))
-      elsif DNS.resolv_conf_policy == "auto" ||
-          DNS.resolv_conf_policy == "STATIC *"
-        UI.ChangeWidget(Id("MODIFY_RESOLV"), :Value, Id(:auto))
-      else
-        UI.ChangeWidget(Id("MODIFY_RESOLV"), :Value, Id(:custom))
-      end
+      default = modify_resolv_default
+
+      UI.ChangeWidget(Id("MODIFY_RESOLV"), :Value, default)
       #then disable if needed
       disableItemsIfNM(["MODIFY_RESOLV"], false)
 
