@@ -169,9 +169,7 @@ module Yast
     end
     def AddressSequence(which)
       aliases = {
-        #	"changedefaults": [ ``(ChangeDefaults()), true ],
-        "address"     => lambda(
-        ) do
+        "address"     => lambda() do
           AddressDialog()
         end,
         "hosts"       => lambda { HostsMainDialog(false) },

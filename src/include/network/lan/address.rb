@@ -160,7 +160,6 @@ module Yast
             method(:initIfcfg),
             "void (string)"
           ),
-          #	"handle": HandleIfcfg,
           "validate_type"     => :function,
           "validate_function" => fun_ref(
             method(:ValidateIfcfgType),
@@ -168,8 +167,6 @@ module Yast
           )
         },
         "IFCFGID" =>
-          #	"valid_chars": NetworkInterfaces::ValidCharsIfcfg (),
-          #	"handle": HandleIfcfg,
           {
             "widget" => :textentry,
             # ComboBox label
@@ -220,10 +217,6 @@ module Yast
           ),
           "opt"           => [:hstretch],
           "init"          => fun_ref(method(:InitVLANSlave), "void (string)"),
-          "handle"        => fun_ref(
-            method(:HandleVLANSlave),
-            "symbol (string, map)"
-          ),
           "store"         => fun_ref(
             method(:StoreVLANSlave),
             "void (string, map)"
@@ -243,7 +236,6 @@ module Yast
             )
           ),
           "label"         => _("Bond &Slaves"),
-          #        "opt": [`shrinkable],
           "init"          => fun_ref(
             method(:InitSlave),
             "void (string)"
@@ -397,12 +389,6 @@ module Yast
       )
     end
 
-    # obsoleted by GetDefaultsForHW
-    # @return `next
-    def ChangeDefaults
-      :next
-    end
-
     # `RadioButtonGroup uses CurrentButton instead of Value, grrr
     # @param [String] key widget id
     # @return what property to ask for to get the widget value
@@ -547,13 +533,6 @@ module Yast
         Ops.get_integer(@settings, "VLAN_ID", 0)
       )
 
-      nil
-    end
-
-
-    def HandleVLANSlave(key, event)
-      event = deep_copy(event)
-      # formerly tried to edit ifcfg name. bad idea, surrounding code not ready
       nil
     end
 
@@ -812,8 +791,6 @@ module Yast
     # Group called FOO has buttons FOO_bar FOO_qux and values bar qux
     # @param [String] key id of the widget
     def initBootProto(key)
-      #  if (LanItems::type=="br") UI::ReplaceWidget(`rp, `Empty());
-      # 	else
       if LanItems.type != "eth"
         UI.ReplaceWidget(
           :rp,
