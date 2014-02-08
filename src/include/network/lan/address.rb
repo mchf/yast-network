@@ -803,7 +803,7 @@ module Yast
       UI.ChangeWidget(:ipaddr, :Enabled, current == :static)
       UI.ChangeWidget(:netmask, :Enabled, current == :static)
       UI.ChangeWidget(:hostname, :Enabled, current == :static)
-      UI.ChangeWidget(:ibft, :Enabled, current == :none)
+      UI.ChangeWidget(:ibft, :Enabled, current == :none) if UI.WidgetExists(Id(:ibft))
 
       nil
     end
