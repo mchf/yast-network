@@ -1348,12 +1348,11 @@ module Yast
         "IFCFGID"          => LanItems.device
       }
 
-      if LanItems.type == "vlan"
+      case LanItems.type
+      when "vlan"
         Ops.set(@settings, "ETHERDEVICE", LanItems.vlan_etherdevice)
         Ops.set(@settings, "VLAN_ID", Builtins.tointeger(LanItems.vlan_id))
-      end
-
-      if Builtins.contains(["tun", "tap"], LanItems.type)
+      when "tun", "tap"
         @settings = {
           "BOOTPROTO"             => "static",
           "STARTMODE"             => "auto",
@@ -1569,29 +1568,19 @@ module Yast
         end
       end
 
-      if LanItems.type == "vlan"
-        LanItems.vlan_etherdevice = Ops.get_string(@settings, "ETHERDEVICE", "")
-        LanItems.vlan_id = Builtins.tostring(
-          Ops.get_integer(@settings, "VLAN_ID", 0)
-        )
-      elsif LanItems.type == "br"
-        LanItems.bridge_ports = Ops.get_string(@settings, "BRIDGE_PORTS", "")
-      elsif Builtins.contains(["tun", "tap"], LanItems.type)
-        LanItems.tunnel_set_persistent = Ops.get_string(
-          @settings,
-          "TUNNEL_SET_PERSISTENT",
-          ""
-        ) == "yes"
-        LanItems.tunnel_set_owner = Ops.get_string(
-          @settings,
-          "TUNNEL_SET_OWNER",
-          ""
-        )
-        LanItems.tunnel_set_group = Ops.get_string(
-          @settings,
-          "TUNNEL_SET_GROUP",
-          ""
-        )
+      case LanItems.type
+      when "vlan"
+        LanItems.vlan_etherdevice = @settings["ETHERDEVICE"] || ""
+        LanItems.vlan_id = @settings["VLAN_ID"] || 0
+      when LanItems.type == "br"
+        LanItems.bridge_ports = @settings["BRIDGE_PORTS"] || ""
+      when "tun", "tap"
+        LanItems.tunnel_set_persistent =
+          (@settings["TUNNEL_SET_PERSISTENT"] || "") == "yes"
+        LanItems.tunnel_set_owner =
+          (@settings["TUNNEL_SET_OWNER"] || "")
+        LanItems.tunnel_set_group =
+          (@settings["TUNNEL_SET_GROUP"] || "")
       end
 
 
