@@ -37,16 +37,41 @@ module Yast
     #
     # @param [String] key	id of the widget
     def InitBridge(key)
-      br_ports = Builtins.splitstring(
-        Ops.get_string(NetworkInterfaces.Current, "BRIDGE_PORTS", ""),
-        " "
-      )
+      br_ports = LanItems.GetCurrentMap["BRIDGE_PORTS"].split
       items = CreateSlaveItems(
         LanItems.GetBridgeableInterfaces(LanItems.GetCurrentName),
         br_ports
       )
 
       UI.ChangeWidget(Id(key), :Items, items)
+
+      nil
+    end
+
+    # Default function to store the value of devices attached to bridge (BRIDGE_PORTS).
+    # @param [String] key	id of the widget
+    # @param [String] key id of the widget
+    def StoreBridge(key, event)
+      event = deep_copy(event)
+      Ops.set(
+        @settings,
+        "BRIDGE_PORTS",
+        String.CutBlanks(
+          Builtins.mergestring(
+            Convert.convert(
+              UI.QueryWidget(Id("BRIDGE_PORTS"), :SelectedItems),
+              :from => "any",
+              :to   => "list <string>"
+            ),
+            " "
+          )
+        )
+      )
+      Builtins.y2milestone(
+        "store bridge %1 : %2",
+        key,
+        Ops.get_string(@settings, "BRIDGE_PORTS", "")
+      )
 
       nil
     end

@@ -455,34 +455,6 @@ module Yast
     end
 
 
-    # Default function to store the value of devices attached to bridge (BRIDGE_PORTS).
-    # @param [String] key	id of the widget
-    # @param [String] key id of the widget
-    def StoreBridge(key, event)
-      event = deep_copy(event)
-      Ops.set(
-        @settings,
-        "BRIDGE_PORTS",
-        String.CutBlanks(
-          Builtins.mergestring(
-            Convert.convert(
-              UI.QueryWidget(Id("BRIDGE_PORTS"), :SelectedItems),
-              :from => "any",
-              :to   => "list <string>"
-            ),
-            " "
-          )
-        )
-      )
-      Builtins.y2milestone(
-        "store bridge %1 : %2",
-        key,
-        Ops.get_string(@settings, "BRIDGE_PORTS", "")
-      )
-
-      nil
-    end
-
 
     # Default function to init the value of slave ETHERDEVICE box.
     # @param [String] key	id of the widget
