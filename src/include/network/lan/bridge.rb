@@ -37,7 +37,7 @@ module Yast
     #
     # @param [String] key	id of the widget
     def InitBridge(key)
-      br_ports = LanItems.GetCurrentMap["BRIDGE_PORTS"].split
+      br_ports = @settings
       items = CreateSlaveItems(
         LanItems.GetBridgeableInterfaces(LanItems.GetCurrentName),
         br_ports

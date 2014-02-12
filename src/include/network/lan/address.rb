@@ -1361,6 +1361,8 @@ module Yast
           "TUNNEL_SET_OWNER"      => LanItems.tunnel_set_owner,
           "TUNNEL_SET_GROUP"      => LanItems.tunnel_set_group
         }
+      when "br"
+        @settings["BRIDGE_PORTS"] = LanItems.bridge_ports
       end
 
       # #65524
