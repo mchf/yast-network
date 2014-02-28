@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Feb 28 11:21:19 UTC 2014 - mfilka@suse.com
+
+- exclude already configured devices from dhcp candidates when 
+  attempting to do an autoconfiguration at the begining of
+  installation
+- 3.1.27
+
+-------------------------------------------------------------------
 Thu Feb 27 10:44:09 UTC 2014 - mfilka@suse.com
 
 - bnc#865199
