@@ -32,91 +32,90 @@
 module Yast
   class GeneralProposalClient < Client
     def main
-      Yast.import "UI"
-
       textdomain "network"
 
       # The main ()
+      @args = WFM.Args
+
       Builtins.y2milestone("----------------------------------------")
       Builtins.y2milestone("General network settings proposal started")
-      Builtins.y2milestone("Arguments: %1", WFM.Args)
+      Builtins.y2milestone("Arguments: %1", @args)
 
+      Yast.import "UI"
       Yast.import "Lan"
       Yast.import "LanItems"
       Yast.import "NetworkService"
 
       Yast.include self, "network/lan/complex.rb"
 
-      @args = WFM.Args
 
-      @func = Ops.get_string(@args, 0, "")
-      @param = Ops.get_map(@args, 1, {})
+      @func = @args[0].to.s
+      @param = @args[1].to_h
       @ret = {}
 
       # create a textual proposal
-      if @func == "MakeProposal"
-        @proposal = ""
-        @links = []
-        @warning = nil
-        @warning_level = nil
+      case @func
+        when "MakeProposal"
+          @proposal = ""
+          @links = []
 
-        @sum = Lan.SummaryGeneral
-        @proposal = Ops.get_string(@sum, 0, "")
-        @links = Ops.get_list(@sum, 1, [])
+          @sum = Lan.SummaryGeneral
+          @proposal = @sum[0].to_s
+          @links = @sum[1].to_a
 
-        @ret = {
-          "preformatted_proposal" => @proposal,
-          "links"                 => @links,
-          "warning_level"         => @warning_level,
-          "warning"               => @warning
-        }
-      # run the module
-      elsif @func == "AskUser"
-        @chosen_id = Ops.get_string(@param, "chosen_id", "")
-        @seq = :next
-        if @chosen_id == "lan--nm-enable"
-          NetworkService.use_network_manager
-        elsif @chosen_id == "lan--nm-disable"
-          NetworkService.use_netconfig
-        elsif @chosen_id == "ipv6-enable"
-          Lan.SetIPv6(true)
-        elsif @chosen_id == "ipv6-disable"
-          Lan.SetIPv6(false)
-        elsif @chosen_id == "virtual-enable"
-          Lan.virt_net_proposal = true
-        elsif @chosen_id == "virtual-revert"
-          Lan.virt_net_proposal = false
+          @ret = {
+            "preformatted_proposal" => @proposal,
+            "links"                 => @links,
+          }
+        # run the module
+        when "AskUser"
+          @chosen_id = @param["chosen_id"].to_s
+          @seq = :next
+          case @chosen_id
+            when "lan--nm-enable"
+              NetworkService.use_network_manager
+            when "lan--nm-disable"
+              NetworkService.use_netconfig
+            when "ipv6-enable"
+              Lan.SetIPv6(true)
+            when "ipv6-disable"
+              Lan.SetIPv6(false)
+            when "virtual-enable"
+              Lan.virt_net_proposal = true
+            when "virtual-revert"
+              Lan.virt_net_proposal = false
+            else
+              Wizard.CreateDialog
+              Wizard.SetDesktopTitleAndIcon("lan")
+
+              @seq = ManagedDialog()
+              Wizard.CloseDialog
+          end
+          LanItems.proposal_valid = false # repropose
+          LanItems.SetModified
+          @ret = { "workflow_sequence" => @seq }
+        # create titles
+        when "Description"
+          @ret = {
+            # RichText label
+            "rich_text_title" => _("General Network Settings"),
+            # Menu label
+            "menu_title"      => _("General &Network Settings"),
+            "id"              => "networkmode"
+          }
+        # write the proposal
+        when "Write"
+          Builtins.y2debug("lan_proposal did it")
         else
-          Wizard.CreateDialog
-          Wizard.SetDesktopTitleAndIcon("lan")
-
-          @seq = ManagedDialog()
-          Wizard.CloseDialog
-        end
-        LanItems.proposal_valid = false # repropose
-        LanItems.SetModified
-        @ret = { "workflow_sequence" => @seq }
-      # create titles
-      elsif @func == "Description"
-        @ret = {
-          # RichText label
-          "rich_text_title" => _("General Network Settings"),
-          # Menu label
-          "menu_title"      => _("General &Network Settings"),
-          "id"              => "networkmode"
-        }
-      # write the proposal
-      elsif @func == "Write"
-        Builtins.y2debug("lan_proposal did it")
-      else
-        Builtins.y2error("unknown function: %1", @func)
+          Builtins.y2error("unknown function: #{@func}")
+          raise ArgumentError, "Unknown function: #{@func}"
       end
 
       # Finish
-      Builtins.y2debug("ret=%1", @ret)
-      Builtins.y2milestone("General network settings proposal finished")
+      Builtins.y2milestone("General network settings proposal finished (#{@ret})")
       Builtins.y2milestone("----------------------------------------")
-      deep_copy(@ret) 
+
+      @ret
 
       # EOF
     end
