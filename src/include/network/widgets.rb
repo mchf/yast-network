@@ -418,7 +418,7 @@ module Yast
           "symbol (string, map)"
         ),
         "store"         => fun_ref(method(:storeIPv6), "void (string, map)")
-      },
+      }
     end
 
     def GetDeviceDescription(device_id)

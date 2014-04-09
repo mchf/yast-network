@@ -477,49 +477,6 @@ module Yast
       nil
     end
 
-    def ManagedDialog
-      widget_descr = Builtins.union(
-        Ops.get(@wd, "MANAGED", {}),
-        Ops.get(@wd, "IPV6", {})
-      )
-      contents = VBox(HSquash(VBox("MANAGED", VSpacing(0.5), "IPV6")))
-
-      functions = { :abort => fun_ref(method(:ReallyAbort), "boolean ()") }
-
-      ret = CWM.ShowAndRun(
-        {
-          "widget_descr"       => @wd,
-          "contents"           => contents,
-          # Network setup method dialog caption
-          "caption"            => _(
-            "Network Setup Method"
-          ),
-          "back_button"        => Label.BackButton,
-          "abort_button"       => Label.CancelButton,
-          "next_button"        => Label.OKButton,
-          # #54027
-          "disable_buttons"    => ["back_button"],
-          "fallback_functions" => functions
-        }
-      )
-
-      # #148485: always show the device overview
-      ret
-    end
-
-    # Evaluates if user should be asked again according dialogs result value
-    #
-    # it is basically useful if user aborts dialog and he has done some
-    # changes already. Calling this function may results in confirmation
-    # popup.
-    def input_done?(ret)
-      if ret == :abort && LanItems.modified
-        return ReallyAbort()
-      else
-        return true
-      end
-    end
-
     def MainDialog(init_tab)
       caption = _("Network Settings")
       widget_descr = {

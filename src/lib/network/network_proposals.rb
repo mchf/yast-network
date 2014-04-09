@@ -1,4 +1,5 @@
 require "yast"
+require "network/managed_dialog"
 
 module Yast
 
@@ -10,8 +11,6 @@ module Yast
     Yast.import "Lan"
     Yast.import "LanItems"
     Yast.import "NetworkService"
-
-#    Yast.include self, "network/lan/complex.rb"
 
     PROPOSAL_ID = "networkmode"
 
@@ -59,11 +58,7 @@ module Yast
         when "virtual-revert"
           Lan.virt_net_proposal = false
         else
-          Wizard.CreateDialog
-          Wizard.SetDesktopTitleAndIcon("lan")
-
-          ret = ManagedDialog()
-          Wizard.CloseDialog
+          ret = ManagedDialog.instance.run
       end
 
       LanItems.proposal_valid = false # repropose
