@@ -875,7 +875,7 @@ module Yast
         end
       end
       descr = Builtins.sformat(
-        "<ul><li>%1: %2 (%3)</li></ul> \n\t\t\t     <ul><li>%4 (%5)</li></ul>",
+        "<ul><li>%1: %2 (%3)</li><li>%4 (%5)</li></ul>",
         header_nm,
         status_nm,
         link_nm,
