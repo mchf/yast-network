@@ -31,6 +31,7 @@ module Yast
 
     include UIShortcuts
     include I18n
+    include Yast        # for deep_copy, ...
 
     def initialize_network_routines(include_target)
       Yast.import "UI"

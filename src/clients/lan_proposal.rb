@@ -187,18 +187,6 @@ module Yast
 
       # EOF
     end
-
-    # Decides if a proposal for virtualization host machine is required.
-    def VirtProposalRequired
-      # S390 has special requirements. See bnc#817943
-      return false if Arch.s390
-
-      return true if PackageSystem.Installed("xen") && !Arch.is_xenU
-      return true if PackageSystem.Installed("kvm")
-      return true if PackageSystem.Installed("qemu")
-
-      false
-    end
   end
 end
 

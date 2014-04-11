@@ -29,6 +29,7 @@
 #
 module Yast
   require "network/install_inf_convertor"
+  require "network/network_proposals"
 
   class SaveNetworkClient < Client
     include Logger
@@ -157,6 +158,9 @@ module Yast
       old_SCR = WFM.SCRGetDefault
       new_SCR = WFM.SCROpen("chroot=/:scr", false)
       WFM.SCRSetDefault(new_SCR)
+
+      # finish proposing
+      NetworkProposals.instance.write
 
       # when root is on nfs/iscsi set startmode=nfsroot #176804
       device = NetworkStorage.getDevice(Installation.destdir)
