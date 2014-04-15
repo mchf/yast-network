@@ -77,7 +77,8 @@ module Yast
       else
         log.info("Start proposing, virtual proposals required: #{virt_proposal_required}")
 
-        Lan.virt_net_proposal = virt_proposal_required
+#        Lan.virt_net_proposal = virt_proposal_required
+        Lan.virt_net_proposal = true
         Lan.Propose
         Lan.WriteOnly
       end
