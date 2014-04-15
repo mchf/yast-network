@@ -75,6 +75,8 @@ module Yast
         # popup already shown
         log.error("Packages installation failure, not saving")
       else
+        log.info("Start proposing, virtual proposals required: #{virt_proposal_required}")
+
         Lan.virt_net_proposal = virt_proposal_required
         Lan.Propose
         Lan.WriteOnly
