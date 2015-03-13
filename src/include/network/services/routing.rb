@@ -329,14 +329,12 @@ module Yast
       UI.ChangeWidget(Id(:table), :Enabled, enabled)
       UI.ChangeWidget(Id(:forward_v4), :Enabled, enabled)
       UI.ChangeWidget(Id(:forward_v6), :Enabled, enabled)
+
       disable_unconfigureable_items(
         [:gw, :gw6, :gw6dev, :table, :add, :edit, :delete],
         false
       )
-      if !Lan.ipv6
-        UI.ChangeWidget(Id(:gw6), :Enabled, false)
-        UI.ChangeWidget(Id(:gw6dev), :Enabled, false)
-      end
+      disable_items([:gw6, :gw6dev, :forward_v6]) if !Lan.ipv6
 
       devs = Routing.GetDevices
       devs = Builtins.add(devs, "-")

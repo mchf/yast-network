@@ -1015,6 +1015,13 @@ module Yast
       return false
     end
 
+    # Disables given widgets
+    #
+    # @items [array] list of widget ids
+    def disable_items(items)
+      items.each { |i| UI.ChangeWidget(Id(i), :Enabled, false) }
+    end
+
     # Disables all widgets which cannot be configured with current network service
     #
     # see bnc#433084
@@ -1024,7 +1031,7 @@ module Yast
     def disable_unconfigureable_items(items, show_popup)
       return false if !unconfigureable_service?
 
-      items.each { |i| UI.ChangeWidget(Id(i), :Enabled, false) }
+      disable_items(items)
 
       if show_popup
         Popup.Warning(
