@@ -192,12 +192,9 @@ module Yast
         "commit"      => [-> { Commit() }, true]
       }
 
-      ws_start = which == "wire" ? "wire" : "address" # "changedefaults";
+      ws_start = which == "wire" ? "wire" : "address"
       sequence = {
         "ws_start"    => ws_start,
-        # 	"changedefaults" : $[
-        # 	    `next	: "address",
-        # 	],
         "address"     => {
           abort:    :abort,
           next:     "commit",
