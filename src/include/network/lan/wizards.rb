@@ -150,9 +150,14 @@ module Yast
 
     def NetworkCardSequence(action)
       aliases = {
-        "hardware" => -> { HardwareDialog() },
-        "address"  => -> { AddressSequence("") },
-        "s390"     => -> { S390Dialog() }
+        "hardware"    => -> { HardwareDialog() },
+        "address"     => -> { AddressSequence("") },
+        "s390"        => -> { S390Dialog() },
+        "wire"        => -> { WirelessDialog() },
+        "expert"      => -> { WirelessExpertDialog() },
+        "keys"        => -> { WirelessKeysDialog() },
+        "eap"         => -> { WirelessWpaEapDialog() },
+        "eap-details" => -> { WirelessWpaEapDetailsDialog() },
       }
 
       ws_start = case action
@@ -171,40 +176,9 @@ module Yast
 
       sequence = {
         "ws_start" => ws_start,
-        "hardware" => { abort: :back, next: "address" },
+        "hardware" => { abort: :back, next: "address", wire: "wire" },
         "address"  => { abort: :back, next: :next },
-        "s390"     => { abort: :abort, next: "address" }
-      }
-
-      Sequencer.Run(aliases, sequence)
-    end
-
-    def AddressSequence(which)
-      aliases = {
-        "address"     => -> { AddressDialog() },
-        "hosts"       => -> { HostsMainDialog(false) },
-        "s390"        => -> { S390Dialog() },
-        "wire"        => -> { WirelessDialog() },
-        "expert"      => -> { WirelessExpertDialog() },
-        "keys"        => -> { WirelessKeysDialog() },
-        "eap"         => -> { WirelessWpaEapDialog() },
-        "eap-details" => -> { WirelessWpaEapDetailsDialog() },
-        "commit"      => [-> { Commit() }, true]
-      }
-
-      ws_start = which == "wire" ? "wire" : "address"
-      sequence = {
-        "ws_start"    => ws_start,
-        "address"     => {
-          abort:    :abort,
-          next:     "commit",
-          wire:     "wire",
-          hosts:    "hosts",
-          s390:     "s390",
-          hardware: :hardware
-        },
-        "s390"        => { abort: :abort, next: "address" },
-        "hosts"       => { abort: :abort, next: "address" },
+        "s390"     => { abort: :abort, next: "address" },
         "wire"        => {
           next:   "commit",
           expert: "expert",
@@ -220,6 +194,31 @@ module Yast
           abort:   :abort
         },
         "eap-details" => { next: "eap", abort: :abort },
+      }
+
+      Sequencer.Run(aliases, sequence)
+    end
+
+    def AddressSequence(which)
+      aliases = {
+        "address"     => -> { AddressDialog() },
+        "hosts"       => -> { HostsMainDialog(false) },
+        "s390"        => -> { S390Dialog() },
+        "commit"      => [-> { Commit() }, true]
+      }
+
+      sequence = {
+        "ws_start"    => ws_start,
+        "address"     => {
+          abort:    :abort,
+          next:     "commit",
+          wire:     "wire",
+          hosts:    "hosts",
+          s390:     "s390",
+          hardware: :hardware
+        },
+        "s390"        => { abort: :abort, next: "address" },
+        "hosts"       => { abort: :abort, next: "address" },
         "commit"      => { next: :next }
       }
 
