@@ -333,6 +333,8 @@ module Yast
     # @param routes [Array] of hashes which defines route
     # @return [true, false] if it succeedes
     def write_routes(routes)
+      log.info("Routing - writing: #{routes}")
+
       # create if not exists, otherwise backup
       if FileUtils.Exists(ROUTES_FILE)
         SCR.Execute(
@@ -364,6 +366,8 @@ module Yast
     # @return true if success
     def Import(settings)
       settings = deep_copy(settings)
+
+      log.info("Routing - importing: #{settings}")
 
       # Getting a list of devices which have already been imported by Lan.Import
       # (bnc#900352)
