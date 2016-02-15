@@ -1135,6 +1135,12 @@ module Yast
         log.info "Attempting to reload network service, normal stage " \
           "#{Stage.normal}, ssh: #{Linuxrc.usessh}"
 
+# debug {
+        cmd = "systemctl status NetworkManager"
+        running_service = SCR.Execute(path(".target.bash_output"), cmd)
+        Builtins.y2milestone("lan_auto - milestone: before ReloadOrRestart, running service: #{running_service.inspect}") if running_service
+# }
+
         # If the second installation stage has been called by yast.ssh via
         # ssh, we should not restart network cause systemctl
         # hangs in that case. (bnc#885640)

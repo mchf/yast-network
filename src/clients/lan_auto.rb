@@ -35,6 +35,12 @@ module Yast
       Builtins.y2milestone("----------------------------------------")
       Builtins.y2milestone("Lan autoinst client started")
 
+# debug {
+      cmd = "systemctl status NetworkManager"
+      running_service = SCR.Execute(path(".target.bash_output"), cmd)
+      Builtins.y2milestone("lan_auto - begin, running service: #{running_service.inspect}") if running_service
+# }
+
       Yast.import "Lan"
       Yast.import "Progress"
       Yast.import "Arch"
@@ -120,6 +126,12 @@ module Yast
         Builtins.y2error("Writing udev rules failed") if !result
         @ret = result
 
+# debug {
+      cmd = "systemctl status NetworkManager"
+      running_service = SCR.Execute(path(".target.bash_output"), cmd)
+      Builtins.y2milestone("lan_auto - milestone: after LanUdevAuto, running service: #{running_service.inspect}") if running_service
+# }
+
         result = Lan.WriteOnly
         Builtins.y2error("Writing lan config failed") if !result
         @ret &&= result
@@ -145,6 +157,12 @@ module Yast
         Builtins.y2error("unknown function: %1", @func)
         @ret = false
       end
+
+# debug {
+      cmd = "systemctl status NetworkManager"
+      running_service = SCR.Execute(path(".target.bash_output"), cmd)
+      Builtins.y2milestone("lan_auto - end, running service: #{running_service.inspect}") if running_service
+# }
 
       Builtins.y2milestone("Lan auto finished (#{@ret})")
       Builtins.y2milestone("----------------------------------------")
