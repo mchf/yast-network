@@ -2581,7 +2581,6 @@ module Yast
     publish_variable :udev_net_rules, "map <string, any>"
     publish_variable :driver_options, "map <string, any>"
     publish_variable :autoinstall_settings, "map"
-    publish_variable :modified, "boolean"
     publish_variable :operation, "symbol"
     publish_variable :force_restart, "boolean"
     publish_variable :description, "string"
