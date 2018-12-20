@@ -1518,11 +1518,13 @@ module Yast
       return if !(ip_changed || hostname_changed || hostname.empty?)
 
       # store old names, remove the record
+      log.info("Dropping record for #{LanItems.ipaddr} from /etc/hosts")
+
       names = Host.names(LanItems.ipaddr).first
       Host.remove_ip(LanItems.ipaddr)
 
-      if ip_changed && !hostname_changed
-        log.info("Dropping record for #{LanItems.ipaddr} from /etc/hosts")
+      if ip_changed && !hostname_changed && !hostname.empty?
+        log.info("Adding record for #{LanItems.ipaddr} #{names.inspect} into /etc/hosts")
 
         Host.add_name(ipaddr, names)
       end
